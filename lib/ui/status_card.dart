@@ -172,8 +172,8 @@ progress: animation.value,
             ),
           ),
           Container(
-            width: 168,
-            height: 168,
+            width: 142,
+            height: 142,
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -185,8 +185,8 @@ progress: animation.value,
               boxShadow: [
                 BoxShadow(
                   color: primary.withValues(alpha: 0.42),
-                  blurRadius: 28,
-                  spreadRadius: 2,
+                  blurRadius: status == VpnStatus.connected ? 30 : 28,
+                  spreadRadius: status == VpnStatus.connected ? 4 : 2,
                 ),
                 BoxShadow(
                   color: secondary.withValues(alpha: 0.28),
@@ -203,7 +203,7 @@ progress: animation.value,
                 onTap: onTap,
                 child: Container(
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle,
+                    shape: BoxShape.circle, gradient: status == VpnStatus.connected ? const RadialGradient(colors: [Color(0x66FF6B4A), Color(0x28FF4F5E), Color(0xFF1B1429)], stops: [0.0, 0.55, 1.0]) : null,
                     border: Border.all(
                       color: Colors.white.withValues(alpha: isDark ? 0.08 : 0.2),
                     ),
@@ -212,8 +212,8 @@ progress: animation.value,
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      Opacity(
-                        opacity: 0.09,
+                      AnimatedOpacity(duration: const Duration(milliseconds: 400),
+                        opacity: status == VpnStatus.connected ? 0.42 : (status == VpnStatus.connecting || status == VpnStatus.disconnecting ? 0.18 : 0.09),
                         child: Transform.scale(
                           scale: 1.45,
                           child: Image.asset(
@@ -227,7 +227,7 @@ progress: animation.value,
                     children: [
                       Icon(
                         Symbols.power_settings_new_rounded,
-                        size: 52,
+                        size: 46, shadows: status == VpnStatus.connected ? const [Shadow(color: Color(0xCC000000), blurRadius: 10)] : null,
                         color: primary,
                       ),
                       const SizedBox(height: 10),
@@ -238,7 +238,7 @@ progress: animation.value,
                           color: labelColor,
                           fontSize: 12,
                           fontWeight: FontWeight.w700,
-                          letterSpacing: 1.3,
+                          letterSpacing: 1.3, shadows: status == VpnStatus.connected ? const [Shadow(color: Color(0xCC000000), blurRadius: 8)] : null,
                         ),
                       ),
 if (status == VpnStatus.connecting) ...[
@@ -293,8 +293,8 @@ class _MeshRingPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final outerR = size.width / 2 - 10;
-    final midR = outerR - 18;
+    final outerR = size.width * 0.47;
+    final midR = size.width * 0.36; final edgeR = size.width * 0.29;
     const count = 12;
     final spin = active && !connected ? progress * 2 * math.pi : 0.0;
     final pulse = active && !connected
@@ -302,21 +302,13 @@ class _MeshRingPainter extends CustomPainter {
         : 0.0;
 
     final outerNodes = <Offset>[];
-    final midNodes = <Offset>[];
+    final midNodes = <Offset>[]; final edgeNodes = <Offset>[];
     for (int i = 0; i < count; i++) {
       final a = (i / count) * 2 * math.pi - math.pi / 2 + spin;
       final aMid = a + math.pi / count;
-      outerNodes.add(
-        Offset(center.dx + outerR * math.cos(a), center.dy + outerR * math.sin(a)),
-      );
-      midNodes.add(
-        Offset(
-          center.dx + midR * math.cos(aMid),
-          center.dy + midR * math.sin(aMid),
-        ),
-      );
+     outerNodes.add(Offset(center.dx + outerR * math.cos(aMid), center.dy + outerR * math.sin(aMid))); midNodes.add(Offset(center.dx + midR * math.cos(a), center.dy + midR * math.sin(a))); edgeNodes.add(Offset(center.dx + edgeR * math.cos(a), center.dy + edgeR * math.sin(a)));
     }
-
+    canvas.drawCircle(center, midR, Paint()..style = PaintingStyle.stroke..strokeWidth = 3.5..color = primary.withValues(alpha: connected ? 0.22 : 0.14 + 0.10 * pulse)); canvas.drawCircle(center, midR, Paint()..style = PaintingStyle.stroke..strokeWidth = 1.0..color = primary.withValues(alpha: connected ? 0.55 : 0.35 + 0.15 * pulse));
     final faintPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 0.9;
@@ -333,12 +325,12 @@ class _MeshRingPainter extends CustomPainter {
       canvas.drawLine(outerNodes[i], outerNodes[next], boldPaint);
       canvas.drawLine(midNodes[i], midNodes[next], faintPaint);
       canvas.drawLine(outerNodes[i], midNodes[i], boldPaint);
-      canvas.drawLine(outerNodes[next], midNodes[i], faintPaint);
+      canvas.drawLine(outerNodes[next], midNodes[i], faintPaint); canvas.drawLine(edgeNodes[i], midNodes[i], faintPaint); canvas.drawLine(edgeNodes[i], midNodes[next], faintPaint);
     }
 
     final dotPaint = Paint()..style = PaintingStyle.fill;
     for (int i = 0; i < count; i++) {
-      final c = _nodeColor(i, count);
+      final c = _nodeColor(i, count) dotPaint.color = c.withValues(alpha: connected ? 0.26 : 0.18 + 0.10 * pulse); canvas.drawCircle(outerNodes[i], 6.5, dotPaint); canvas.drawCircle(midNodes[i], 5.5, dotPaint);;
       dotPaint.color = c.withValues(alpha: connected ? 0.95 : 0.8 + 0.2 * pulse);
       canvas.drawCircle(outerNodes[i], 3.2, dotPaint);
       dotPaint.color = c.withValues(alpha: connected ? 0.65 : 0.55);
