@@ -12,7 +12,7 @@ class LicensePageView extends StatelessWidget {
         title: const Text('License'),
         actions: [
           TextButton(
-            onPressed: () => showLicensePage(context: context, applicationName: 'BPB'),
+            onPressed: () => showLicensePage(context: context, applicationName: 'Pani Mesh'),
             child: const Text('Third-party'),
           ),
         ],
@@ -27,7 +27,7 @@ class LicensePageView extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'BPB is free software: you can redistribute it and/or modify it under the terms of the '
+                  'Pani Mesh is free software: you can redistribute it and/or modify it under the terms of the '
                   'GNU General Public License as published by the Free Software Foundation, version 3. '
                   'It includes code adapted from BPB-Worker-Panel (GPL-3.0) and uses Xray-core.',
                   style: Theme.of(context).textTheme.bodyMedium,
