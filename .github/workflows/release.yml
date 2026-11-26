@@ -81,16 +81,18 @@ jobs:
 
       - name: Tor bridges for the setup wizard (fresh each build)
         run: bash scripts/fetch_tor_bridges.sh
-
-      - run: flutter pub get --enforce-lockfile
-
-      - run: flutter test --no-pub
       - name: Extract custom app icons
         run: |
           if [ -f "pani-mesh-icons.zip" ]; then
             rm -rf android/app/src/main/res/mipmap-anydpi-v26
             unzip -o pani-mesh-icons.zip -d .
+            cp android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png assets/icons/pani_mesh_logo.png
           fi
+          
+      - run: flutter pub get --enforce-lockfile
+
+      - run: flutter test --no-pub
+      
           
       - name: Sign release APKs
         env:
