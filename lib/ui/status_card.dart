@@ -330,7 +330,7 @@ class _MeshRingPainter extends CustomPainter {
 
     final dotPaint = Paint()..style = PaintingStyle.fill;
     for (int i = 0; i < count; i++) {
-      final c = _nodeColor(i, count) dotPaint.color = c.withValues(alpha: connected ? 0.26 : 0.18 + 0.10 * pulse); canvas.drawCircle(outerNodes[i], 6.5, dotPaint); canvas.drawCircle(midNodes[i], 5.5, dotPaint);;
+      final c = _nodeColor(i, count); dotPaint.color = c.withValues(alpha: connected ? 0.26 : 0.18 + 0.10 * pulse); canvas.drawCircle(outerNodes[i], 6.5, dotPaint); canvas.drawCircle(midNodes[i], 5.5, dotPaint);;
       dotPaint.color = c.withValues(alpha: connected ? 0.95 : 0.8 + 0.2 * pulse);
       canvas.drawCircle(outerNodes[i], 3.2, dotPaint);
       dotPaint.color = c.withValues(alpha: connected ? 0.65 : 0.55);
