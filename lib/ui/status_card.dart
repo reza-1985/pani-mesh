@@ -403,15 +403,11 @@ class _PowerButtonState extends State<_PowerButton> {
   @override
   Widget build(BuildContext context) {
     final state = AppScope.of(context);
-    final scheme = Theme.of(context).colorScheme;
     final busy = state.isBusy;
     final (Color fill, Color iconColor) = switch (state.status) {
-      VpnStatus.connected => (_green, Colors.white),
-      VpnStatus.disconnected => (
-        scheme.primaryContainer,
-        scheme.onPrimaryContainer,
-      ),
-      _ => (scheme.primary, scheme.onPrimary),
+      VpnStatus.connected => (const Color(0xFFFF4F5E), Colors.white),
+      VpnStatus.disconnected => (const Color(0xFF00D2FF), Colors.white),
+      _ => (const Color(0xFF8B5CF6), Colors.white),  
     };
     final up =
         state.status == VpnStatus.connected ||
@@ -453,7 +449,7 @@ class _PowerButtonState extends State<_PowerButton> {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color.lerp(fill, Colors.white, 0.18)!, fill],
+                  colors: state.status == VpnStatus.connected ? const [Color(0xFFFF6B4A), Color(0xFFFF4F5E)] : [Color.lerp(fill, Colors.white, 0.18)!, fill],
                 ),
                 boxShadow: [
                   // Coloured glow, stronger when connected.
