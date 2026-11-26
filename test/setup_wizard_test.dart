@@ -20,7 +20,7 @@ void main() {
   testWidgets('step 1 asks about a Cloudflare account, No shows sign-up steps', (tester) async {
     await pumpWizard(tester);
     expect(find.text('Step 1 of 3'), findsOneWidget);
-    expect(find.text('Welcome to BPB'), findsOneWidget);
+    expect(find.text('Welcome to Pani Mesh'), findsOneWidget);
 
     await tester.tap(find.text('No, sign me up'));
     await tester.pumpAndSettle();
@@ -28,7 +28,7 @@ void main() {
 
     await tester.tap(find.text('Back'));
     await tester.pumpAndSettle();
-    expect(find.text('Welcome to BPB'), findsOneWidget);
+    expect(find.text('Welcome to Pani Mesh'), findsOneWidget);
   });
 
   testWidgets('Yes goes to the token step, Back returns', (tester) async {
