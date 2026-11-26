@@ -155,23 +155,25 @@ final Animation<double> animation;
         : theme.colorScheme.onSurface;
 
     return AnimatedBuilder(animation: animation, builder: (context, _) { return SizedBox(
-      width: 248,
-      height: 248,
+      width: 244,
+      height: 244,
       child: Stack(
         alignment: Alignment.center,
         children: [
           CustomPaint(
-            size: const Size(248, 248),
+            size: const Size(244, 244),
             painter: _MeshRingPainter(
               primary: primary,
               secondary: secondary,
+              tertiary: status == VpnStatus.disconnected ? _coralStart : secondary,
+              connected: status == VpnStatus.connected,
               active: status == VpnStatus.connected || busy,
 progress: animation.value,
             ),
           ),
           Container(
-            width: 188,
-            height: 188,
+            width: 168,
+            height: 168,
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
@@ -206,7 +208,21 @@ progress: animation.value,
                       color: Colors.white.withValues(alpha: isDark ? 0.08 : 0.2),
                     ),
                   ),
-                  child: Column(
+                  child: ClipOval(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Opacity(
+                        opacity: 0.09,
+                        child: Transform.scale(
+                          scale: 1.45,
+                          child: Image.asset(
+                            'assets/icons/pani_mesh_logo.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
@@ -231,6 +247,9 @@ Text('TAP TO CANCEL', textAlign: TextAlign.center, style: TextStyle(color: label
 ],
                     ],
                   ),
+                    ],
+                  ),
+                ),
                 ),
               ),
             ),
@@ -242,61 +261,88 @@ Text('TAP TO CANCEL', textAlign: TextAlign.center, style: TextStyle(color: label
   }
 }
 
+
+
 class _MeshRingPainter extends CustomPainter {
   const _MeshRingPainter({
     required this.primary,
     required this.secondary,
+    required this.tertiary,
     required this.active,
-this.progress = 0.0,
+    required this.connected,
+    this.progress = 0.0,
   });
 
   final Color primary;
   final Color secondary;
+  final Color tertiary;
   final bool active;
-final double progress;
+  final bool connected;
+  final double progress;
+
+  Color _nodeColor(int i, int count) {
+    if (connected) {
+      return Color.lerp(primary, secondary, (i % 3) / 2.0)!;
+    }
+    final t = (i / count) * 3.0;
+    if (t < 1.0) return Color.lerp(primary, secondary, t)!;
+    if (t < 2.0) return Color.lerp(secondary, tertiary, t - 1.0)!;
+    return Color.lerp(tertiary, primary, t - 2.0)!;
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width * 0.46;
-    const nodeCount = 8;
+    final outerR = size.width / 2 - 10;
+    final midR = outerR - 18;
+    const count = 12;
+    final spin = active && !connected ? progress * 2 * math.pi : 0.0;
+    final pulse = active && !connected
+        ? 0.5 + 0.5 * math.sin(progress * 2 * math.pi)
+        : 0.0;
 
-    final points = List<Offset>.generate(nodeCount, (i) {
-      final angle = -math.pi / 2  + progress * 2 * math.pi+ (2 * math.pi * i / nodeCount);
-      return Offset(
-        center.dx + radius * math.cos(angle),
-        center.dy + radius * math.sin(angle),
+    final outerNodes = <Offset>[];
+    final midNodes = <Offset>[];
+    for (int i = 0; i < count; i++) {
+      final a = (i / count) * 2 * math.pi - math.pi / 2 + spin;
+      final aMid = a + math.pi / count;
+      outerNodes.add(
+        Offset(center.dx + outerR * math.cos(a), center.dy + outerR * math.sin(a)),
       );
-    });
-
-    final linePaint = Paint()
-      ..color = primary.withValues(alpha: active ? 0.42 : 0.26)
-      ..strokeWidth = 1.2
-      ..style = PaintingStyle.stroke;
-
-    final crossPaint = Paint()
-      ..color = secondary.withValues(alpha: active ? 0.22 : 0.12)
-      ..strokeWidth = 0.9
-      ..style = PaintingStyle.stroke;
-
-    for (var i = 0; i < nodeCount; i++) {
-      final p1 = points[i];
-      final p2 = points[(i + 1) % nodeCount];
-      final p3 = points[(i + 2) % nodeCount];
-      canvas.drawLine(p1, p2, linePaint);
-      canvas.drawLine(p1, p3, crossPaint);
+      midNodes.add(
+        Offset(
+          center.dx + midR * math.cos(aMid),
+          center.dy + midR * math.sin(aMid),
+        ),
+      );
     }
 
-    final glowPaint = Paint()
-      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 5);
+    final faintPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 0.9;
+    final boldPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.45;
 
-    for (var i = 0; i < nodeCount; i++) {
-      final nodeColor = i.isEven ? primary : secondary;
-      glowPaint.color = nodeColor.withValues(alpha: active ? 0.85 : 0.6);
-      canvas.drawCircle(points[i], 5.5 + (active ? 2.5 * (0.5 + 0.5 * math.sin(progress * 2 * math.pi)) : 0), glowPaint);
+    for (int i = 0; i < count; i++) {
+      final next = (i + 1) % count;
+      final c = _nodeColor(i, count);
+      faintPaint.color = c.withValues(alpha: connected ? 0.30 : 0.22 + 0.12 * pulse);
+      boldPaint.color = c.withValues(alpha: connected ? 0.65 : 0.45 + 0.25 * pulse);
 
-      final corePaint = Paint()..color = nodeColor;
-      canvas.drawCircle(points[i], 3.0, corePaint);
+      canvas.drawLine(outerNodes[i], outerNodes[next], boldPaint);
+      canvas.drawLine(midNodes[i], midNodes[next], faintPaint);
+      canvas.drawLine(outerNodes[i], midNodes[i], boldPaint);
+      canvas.drawLine(outerNodes[next], midNodes[i], faintPaint);
+    }
+
+    final dotPaint = Paint()..style = PaintingStyle.fill;
+    for (int i = 0; i < count; i++) {
+      final c = _nodeColor(i, count);
+      dotPaint.color = c.withValues(alpha: connected ? 0.95 : 0.8 + 0.2 * pulse);
+      canvas.drawCircle(outerNodes[i], 3.2, dotPaint);
+      dotPaint.color = c.withValues(alpha: connected ? 0.65 : 0.55);
+      canvas.drawCircle(midNodes[i], 2.2, dotPaint);
     }
   }
 
@@ -304,8 +350,10 @@ final double progress;
   bool shouldRepaint(_MeshRingPainter oldDelegate) =>
       oldDelegate.primary != primary ||
       oldDelegate.secondary != secondary ||
-oldDelegate.progress != progress ||
-      oldDelegate.active != active;
+      oldDelegate.tertiary != tertiary ||
+      oldDelegate.progress != progress ||
+      oldDelegate.active != active ||
+      oldDelegate.connected != connected;
 }
 
 class _Metrics extends StatelessWidget {
