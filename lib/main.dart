@@ -24,7 +24,7 @@ class BpbApp extends StatelessWidget {
       child: ListenableBuilder(
         listenable: Listenable.merge([state.themeColor, state.themeMode]),
         builder: (context, _) => MaterialApp(
-          title: 'BPB',
+          title: 'Pani Mesh',
           debugShowCheckedModeBanner: false,
           // Android can draw the app into the navigation bar area (notably with
           // gesture navigation). Keep every route's content above that inset.
