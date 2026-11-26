@@ -69,9 +69,11 @@ class HomePage extends StatelessWidget {
             children: [
               if (state.needsReconnect) const _ReconnectBanner(),
               const SizedBox(height: 16),
-              const ConnectionCard(),
-              const SizedBox(height: 16),
               const StatusCard(),
+              const SizedBox(height: 16),
+              const _ProtocolSelectorCard(),
+              const SizedBox(height: 16),
+              const ConnectionCard(),
               const SizedBox(height: 16),
               const _TrafficRow(),
               const SizedBox(height: 16),
@@ -408,3 +410,127 @@ class _AccountUsage extends StatelessWidget {
     );
   }
 }
+
+class _ProtocolSelectorCard extends StatelessWidget {
+  const _ProtocolSelectorCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final state = AppStateScope.of(context);
+    final modes = state.availableModes;
+    final selected = state.mode;
+    final busy = state.isBusy;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    final cardColor =
+        isDark ? const Color(0xFF1A1F38) : theme.colorScheme.surfaceContainerLow;
+    final borderColor = isDark
+        ? Colors.white.withValues(alpha: 0.08)
+        : theme.colorScheme.outlineVariant.withValues(alpha: 0.5);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'CONNECTION MODE',
+            style: theme.textTheme.labelSmall?.copyWith(
+              letterSpacing: 1.2,
+              fontWeight: FontWeight.w700,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.65)
+                  : theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                for (var i = 0; i < modes.length; i++) ...[
+                  if (i > 0) const SizedBox(width: 8),
+                  _ProtocolChip(
+                    label: modes[i].label,
+                    selected: modes[i] == selected,
+                    onTap: busy ? null : () => state.setMode(modes[i]),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProtocolChip extends StatelessWidget {
+  const _ProtocolChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(14),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            gradient: selected
+                ? const LinearGradient(
+                    colors: [Color(0xFF00D2FF), Color(0xFF8B5CF6)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  )
+                : null,
+            color: selected
+                ? null
+                : (isDark
+                    ? const Color(0xFF121528)
+                    : theme.colorScheme.surfaceContainerHighest),
+            border: selected
+                ? null
+                : Border.all(
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.08)
+                        : theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
+                  ),
+          ),
+          child: Text(
+            label,
+            style: theme.textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: selected
+                  ? Colors.white
+                  : (isDark
+                      ? Colors.white.withValues(alpha: 0.78)
+                      : theme.colorScheme.onSurface),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
