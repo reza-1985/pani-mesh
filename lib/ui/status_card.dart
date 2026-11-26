@@ -155,36 +155,36 @@ final Animation<double> animation;
         : theme.colorScheme.onSurface;
 
     return AnimatedBuilder(animation: animation, builder: (context, _) { return SizedBox(
-      width: 244,
-      height: 244,
+      width: 268,
+      height: 268,
       child: Stack(
         alignment: Alignment.center,
         children: [
           CustomPaint(
-            size: const Size(244, 244),
+            size: const Size(268, 268),
             painter: _MeshRingPainter(
               primary: primary,
               secondary: secondary,
               tertiary: status == VpnStatus.disconnected ? _coralStart : secondary,
               connected: status == VpnStatus.connected,
-              active: status == VpnStatus.connected || busy,
+              active: busy,
 progress: animation.value,
             ),
           ),
           Container(
-            width: 142,
-            height: 142,
+            width: 146,
+            height: 146,
             padding: const EdgeInsets.all(4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               gradient: LinearGradient(
-                colors: [primary, secondary],
+                colors: const [Color(0xFF00D2FF), Color(0xFF8B5CF6), Color(0xFFFF6B4A)],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: primary.withValues(alpha: 0.42),
+                  color: primary.withValues(alpha: status == VpnStatus.connected ? 0.56 : 0.26),
                   blurRadius: status == VpnStatus.connected ? 30 : 28,
                   spreadRadius: status == VpnStatus.connected ? 4 : 2,
                 ),
@@ -203,7 +203,7 @@ progress: animation.value,
                 onTap: onTap,
                 child: Container(
                   decoration: BoxDecoration(
-                    shape: BoxShape.circle, gradient: status == VpnStatus.connected ? const RadialGradient(colors: [Color(0x66FF6B4A), Color(0x28FF4F5E), Color(0xFF1B1429)], stops: [0.0, 0.55, 1.0]) : null,
+                    shape: BoxShape.circle, gradient: status == VpnStatus.connected ? const RadialGradient(colors: [Color(0x45FFA56E), Color(0x2E8B5CF6), Color(0xFF1B1469)], stops: [0.0, 0.55, 1.0]) : null,
                     border: Border.all(
                       color: Colors.white.withValues(alpha: isDark ? 0.08 : 0.2),
                     ),
@@ -213,16 +213,16 @@ progress: animation.value,
                     alignment: Alignment.center,
                     children: [
                       AnimatedOpacity(duration: const Duration(milliseconds: 400),
-                        opacity: status == VpnStatus.connected ? 0.42 : (status == VpnStatus.connecting || status == VpnStatus.disconnecting ? 0.18 : 0.09),
-                        child: Transform.scale(
-                          scale: 1.45,
+                        opacity: status == VpnStatus.connected ? 0.96 : (status == VpnStatus.connecting || status == VpnStatus.disconnecting ? 0.24 : 0.11),
+                        child: AnimatedScale(
+                          duration: const Duration(milliseconds: 450), scale: status == VpnStatus.connected ? 1.04 : 0.96,
                           child: Image.asset(
-                            'assets/icons/pani_mesh_logo.png',
-                            fit: BoxFit.cover,
+                            'assets/icons/pani_face_only.png',
+                            width: 120, height: 120, fit: BoxFit.contain,
                           ),
                         ),
                       ),
-                      Column(
+                AnimatedOpacity(opacity: status == VpnStatus.connected ? 0.0 : 1.0, duration: const Duration(milliseconds: 450), child:       Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Icon(
@@ -246,7 +246,7 @@ const SizedBox(height: 2),
 Text('TAP TO CANCEL', textAlign: TextAlign.center, style: TextStyle(color: labelColor.withValues(alpha: 0.7), fontSize: 9, fontWeight: FontWeight.w600, letterSpacing: 1.0)),
 ],
                     ],
-                  ),
+                  ), ),
                     ],
                   ),
                 ),
@@ -280,61 +280,77 @@ class _MeshRingPainter extends CustomPainter {
   final bool connected;
   final double progress;
 
+  static const _palette = [Color(0xFF00D2FF), Color(0xFF8B5CF6), Color(0xFFFF6B4A)];
+
   Color _nodeColor(int i, int count) {
-    if (connected) {
-      return Color.lerp(primary, secondary, (i % 3) / 2.0)!;
-    }
     final t = (i / count) * 3.0;
-    if (t < 1.0) return Color.lerp(primary, secondary, t)!;
-    if (t < 2.0) return Color.lerp(secondary, tertiary, t - 1.0)!;
-    return Color.lerp(tertiary, primary, t - 2.0)!;
+    if (t < 1.0) return Color.lerp(_palette[0], _palette[1], t)!;
+    if (t < 2.0) return Color.lerp(_palette[1], _palette[2], t - 1.0)!;
+    return Color.lerp(_palette[2], _palette[0], t - 2.0)!;
   }
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final outerR = size.width * 0.47;
-    final midR = size.width * 0.36; final edgeR = size.width * 0.29;
-    const count = 12;
+    final w = size.width;
+    const n = 12;
+    final rEdge = w * 0.265;
+    final r1 = w * 0.328;
+    final r2 = w * 0.405;
+    final r3 = w * 0.468;
+    final intensity = connected ? 1.0 : (active ? 0.85 : 0.62);
     final spin = active && !connected ? progress * 2 * math.pi : 0.0;
-    final pulse = active && !connected
-        ? 0.5 + 0.5 * math.sin(progress * 2 * math.pi)
-        : 0.0;
-
-    final outerNodes = <Offset>[];
-    final midNodes = <Offset>[]; final edgeNodes = <Offset>[];
-    for (int i = 0; i < count; i++) {
-      final a = (i / count) * 2 * math.pi - math.pi / 2 + spin;
-      final aMid = a + math.pi / count;
-     outerNodes.add(Offset(center.dx + outerR * math.cos(aMid), center.dy + outerR * math.sin(aMid))); midNodes.add(Offset(center.dx + midR * math.cos(a), center.dy + midR * math.sin(a))); edgeNodes.add(Offset(center.dx + edgeR * math.cos(a), center.dy + edgeR * math.sin(a)));
+    final pulse = active && !connected ? 0.5 + 0.5 * math.sin(progress * 2 * math.pi) : 0.0;
+ final edgeNodes = <Offset>[];
+    final ring1Nodes = <Offset>[];
+    final ring2Nodes = <Offset>[];
+    final ring3Nodes = <Offset>[];
+    final outerDotNodes = <Offset>[];
+    for (int i = 0; i < n; i++) {
+      final baseA = (i / n) * 2 * math.pi - math.pi / 2 + spin;
+      final a1 = baseA + math.pi / n;
+      final jitterA = math.sin(i * 2.3 + 0.7) * 0.12;
+      final jitterR = math.cos(i * 1.7 + 0.4) * (w * 0.014);
+      final a2 = baseA + jitterA;
+      final a3 = baseA + math.pi / (n * 1.5);
+      edgeNodes.add(Offset(center.dx + rEdge * math.cos(baseA), center.dy + rEdge * math.sin(baseA)));
+      ring1Nodes.add(Offset(center.dx + r1 * math.cos(a1), center.dy + r1 * math.sin(a1)));
+      ring2Nodes.add(Offset(center.dx + (r2 + jitterR) * math.cos(a2), center.dy + (r2 + jitterR) * math.sin(a2)));
+      ring3Nodes.add(Offset(center.dx + r3 * math.cos(a3), center.dy + r3 * math.sin(a3)));
+      outerDotNodes.add(Offset(center.dx + (r3 * 1.03) * math.cos(baseA), center.dy + (r3 * 1.03) * math.sin(baseA)));
     }
-    canvas.drawCircle(center, midR, Paint()..style = PaintingStyle.stroke..strokeWidth = 3.5..color = primary.withValues(alpha: connected ? 0.22 : 0.14 + 0.10 * pulse)); canvas.drawCircle(center, midR, Paint()..style = PaintingStyle.stroke..strokeWidth = 1.0..color = primary.withValues(alpha: connected ? 0.55 : 0.35 + 0.15 * pulse));
-    final faintPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.9;
-    final boldPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.45;
-
-    for (int i = 0; i < count; i++) {
-      final next = (i + 1) % count;
-      final c = _nodeColor(i, count);
-      faintPaint.color = c.withValues(alpha: connected ? 0.30 : 0.22 + 0.12 * pulse);
-      boldPaint.color = c.withValues(alpha: connected ? 0.65 : 0.45 + 0.25 * pulse);
-
-      canvas.drawLine(outerNodes[i], outerNodes[next], boldPaint);
-      canvas.drawLine(midNodes[i], midNodes[next], faintPaint);
-      canvas.drawLine(outerNodes[i], midNodes[i], boldPaint);
-      canvas.drawLine(outerNodes[next], midNodes[i], faintPaint); canvas.drawLine(edgeNodes[i], midNodes[i], faintPaint); canvas.drawLine(edgeNodes[i], midNodes[next], faintPaint);
+    canvas.drawCircle(center, r1, Paint()..style = PaintingStyle.stroke..strokeWidth = 3.2..color = _palette[0].withValues(alpha: (0.16 + 0.08 * pulse) * intensity));
+    canvas.drawCircle(center, r1, Paint()..style = PaintingStyle.stroke..strokeWidth = 1.0..color = _palette[0].withValues(alpha: (0.48 + 0.14 * pulse) * intensity));
+    final faintPaint = Paint()..style = PaintingStyle.stroke..strokeWidth = 0.85;
+    final boldPaint = Paint()..style = PaintingStyle.stroke..strokeWidth = 1.35;
+    for (int i = 0; i < n; i++) {
+      final next = (i + 1) % n;
+      final c = _nodeColor(i, n);
+      faintPaint.color = c.withValues(alpha: (0.28 + 0.10 * pulse) * intensity);
+      boldPaint.color = c.withValues(alpha: (0.62 + 0.18 * pulse) * intensity);
+      canvas.drawLine(ring1Nodes[i], ring1Nodes[next], faintPaint);
+      canvas.drawLine(ring2Nodes[i], ring2Nodes[next], boldPaint);
+      canvas.drawLine(ring3Nodes[i], ring3Nodes[next], boldPaint);
+      canvas.drawLine(edgeNodes[i], ring1Nodes[i], faintPaint);
+      canvas.drawLine(edgeNodes[i], ring1Nodes[(i + n - 1) % n], faintPaint);
+      canvas.drawLine(ring1Nodes[i], ring2Nodes[i], faintPaint);
+      canvas.drawLine(ring1Nodes[i], ring2Nodes[next], faintPaint);
+      canvas.drawLine(ring2Nodes[i], ring3Nodes[i], boldPaint);
+      canvas.drawLine(ring2Nodes[next], ring3Nodes[i], faintPaint);
     }
-
     final dotPaint = Paint()..style = PaintingStyle.fill;
-    for (int i = 0; i < count; i++) {
-      final c = _nodeColor(i, count); dotPaint.color = c.withValues(alpha: connected ? 0.26 : 0.18 + 0.10 * pulse); canvas.drawCircle(outerNodes[i], 6.5, dotPaint); canvas.drawCircle(midNodes[i], 5.5, dotPaint);;
-      dotPaint.color = c.withValues(alpha: connected ? 0.95 : 0.8 + 0.2 * pulse);
-      canvas.drawCircle(outerNodes[i], 3.2, dotPaint);
-      dotPaint.color = c.withValues(alpha: connected ? 0.65 : 0.55);
-      canvas.drawCircle(midNodes[i], 2.2, dotPaint);
+    for (int i = 0; i < n; i++) {
+      final c = _nodeColor(i, n);
+      dotPaint.color = c.withValues(alpha: (0.24 + 0.08 * pulse) * intensity);
+      canvas.drawCircle(ring3Nodes[i], 5.5, dotPaint);
+      dotPaint.color = c.withValues(alpha: (0.90 + 0.10 * pulse) * intensity);
+      canvas.drawCircle(ring3Nodes[i], 2.8, dotPaint);
+      dotPaint.color = c.withValues(alpha: 0.72 * intensity);
+      canvas.drawCircle(ring2Nodes[i], 2.2, dotPaint);
+      dotPaint.color = c.withValues(alpha: 0.55 * intensity);
+      canvas.drawCircle(ring1Nodes[i], 1.7, dotPaint);
+      dotPaint.color = c.withValues(alpha: 0.65 * intensity);
+      canvas.drawCircle(outerDotNodes[i], 1.3, dotPaint);
     }
   }
 
