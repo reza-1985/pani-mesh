@@ -121,7 +121,7 @@ class AppState extends ChangeNotifier {
 
   /// App theme colour and light/dark mode. Separate notifiers so only the theme rebuilds.
   final themeColor = ValueNotifier(ThemeColor.blue);
-  final themeMode = ValueNotifier(ThemeMode.system);
+  final themeMode = ValueNotifier(ThemeMode.dark);
 
   VpnStatus status = VpnStatus.disconnected;
   String? error;
@@ -464,7 +464,7 @@ class AppState extends ChangeNotifier {
     themeColor.value =
         ThemeColor.values.asNameMap()[device.themeColor] ?? ThemeColor.blue;
     themeMode.value =
-        ThemeMode.values.asNameMap()[device.themeMode] ?? ThemeMode.system;
+        ThemeMode.values.asNameMap()[device.themeMode] ?? ThemeMode.dark;
   }
 
   /// Defaults everywhere except the private parts and the configured clean IPs and endpoints.
