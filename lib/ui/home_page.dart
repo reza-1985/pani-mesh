@@ -416,7 +416,7 @@ class _ProtocolSelectorCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final state = AppStateScope.of(context);
+    final state = AppScope.of(context);
     final modes = state.availableModes;
     final selected = state.mode;
     final busy = state.isBusy;
