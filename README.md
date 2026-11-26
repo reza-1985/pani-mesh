@@ -1,43 +1,20 @@
-# BPB VPN
+# Pani Mesh
 
-**One app. Multiple ways to stay connected.**
+**Pani Mesh** is a customized Android VPN client forked from `bia-pain-bache/BPB-VPN`, featuring a custom **Pani Mesh** theme and app icon, and ready-to-use **WARP** and **MASQUE** support out of the box.
 
-BPB brings highly customizable Cloudflare CDN connections, Psiphon, Tor, SSH and Serverless solutions together in one approachable VPN client powered by [Xray-core](https://xtls.github.io). Start with the guided setup, then choose a ready-to-use connection or fine-tune the details for your network.
+## Features
 
-> Built for networks where ordinary connections may be restricted. Results depend on your network and configuration; no method can guarantee access everywhere.
+- **Custom Pani Mesh Branding:** Dedicated Pani Mesh theme and custom app icon.
+- **Out-of-the-Box WARP & MASQUE:** Immediate support for WARP and MASQUE connections alongside VLESS, Psiphon, Tor, SSH, and Serverless options.
+- **Network Tunability:** SNI/IP customization, TLS fingerprints, TCP fragmentation, UDP obfuscation, DNS, routing, and built-in endpoint scanners.
 
-## What makes BPB different?
+## Links
 
-- **Your own Cloudflare setup:** Deploy private Workers and Pages from the app using your own Cloudflare account. The guided wizard walks you through it.
-- **More than one route:** Choose VLESS, WARP, MASQUE, SSH or Serverless connections. Psiphon and Tor are also optimized, built in and can be combined with Serverless methods to bypass regular restrictions.
-- **Tunable for your network:** Adjust SNI and connection IPs, TLS fingerprints, TCP fragmentation, UDP obfuscation, DNS, routing and more DPI bypassing tricks without being locked into one preset.
-- **Find responsive endpoints:** Built-in **REAL** scanners help discover Cloudflare IPs and WARP/MASQUE endpoints. Results depend on your current network and selected settings.
-- **Useful everyday controls:** Per-app proxying, proxy-chain imports, connection logs, configuration sharing and customizable theme.
+- **Downloads (Releases):** [Releases](/reza-1985/pani-mesh/releases)
+- **Bug Reports & Support (Issues):** [Issues](/reza-1985/pani-mesh/issues)
 
-## Get started
+## Upstream & License
 
-1. Download the latest Android APK from [Releases](https://github.com/bia-pain-bache/BPB-VPN/releases/latest).
-2. Open BPB and follow the setup wizard. BPB guides deployment in the app.
-3. Choose a connection and connect. Psiphon, Tor and Serverless are available without adding a Cloudflare account.
+Pani Mesh is a fork of [bia-pain-bache/BPB-VPN](/bia-pain-bache/BPB-VPN). All credit for the core application goes to the original upstream project and its contributors.
 
-Use the **universal APK** if you are unsure which download to choose. Release notes and checksums are included with each release.
-
-## Customize when you need to
-
-Most users can begin with the defaults. If a connection needs adjustment, BPB brings the relevant controls together:
-
-- Choose or scan clean IPs, endpoints, Tor bridges, and tune SNI and TLS fingerprint settings.
-- Enable TCP fragmentation or UDP obfuscation where they help your network.
-- Configure traffic splitting (routing), DNS, IPv4/IPv6, or proxy only selected apps.
-- Import supported v2ray links or WireGuard configurations as chain proxies.
-- Review live connection logs and export or share settings with others.
-
-These are options to experiment with no guarantee. The best settings vary by ISP, location and network conditions.
-
-## Platform
-
-The VPN is only supported on **Android** for now. Other platform builds will be released one by one.
-
-## Open source
-
-BPB is licensed under the [GNU GPL v3.0](LICENSE). See [release notes](RELEASE_NOTES.md) for recent changes and [Issues](https://github.com/bia-pain-bache/BPB-VPN/issues) to report technical bugs or misconfigurations.
+This project is licensed under the **GNU General Public License v3.0 (GNU GPL v3.0)** — see the [LICENSE](LICENSE) file for details.
