@@ -11,7 +11,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 VERSION=16.0.2
-BASE="https://dist.torproject.org/torbrowser/$VERSION"
+BASE="https://archive.torproject.org/tor-package-archive/torbrowser"
 JNI=../android/app/src/main/jniLibs
 ASSETS=../android/app/src/main/assets
 
