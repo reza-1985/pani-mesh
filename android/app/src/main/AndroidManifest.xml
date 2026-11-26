@@ -18,7 +18,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:networkSecurityConfig="@xml/network_security_config">
         <activity
-            android:name=".MainActivity"
+            android:name="com.bpb.MainActivity"
             android:exported="true"
             android:launchMode="singleTop"
             android:taskAffinity=""
@@ -44,7 +44,7 @@
         </activity>
 
         <service
-            android:name=".BpbVpnService"
+            android:name="com.bpb.BpbVpnService"
             android:exported="false"
             android:foregroundServiceType="specialUse"
             android:permission="android.permission.BIND_VPN_SERVICE">
@@ -60,10 +60,10 @@
         </service>
 
         <service
-            android:name=".BpbTileService"
+            android:name="com.bpb.BpbTileService"
             android:exported="true"
             android:icon="@drawable/ic_stat_vpn"
-            android:label="BPB"
+            android:label="Pani Mesh"
             android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
             <intent-filter>
                 <action android:name="android.service.quicksettings.action.QS_TILE" />
