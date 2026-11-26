@@ -25,10 +25,12 @@ class StatusCard extends StatefulWidget {
   State<StatusCard> createState() => _StatusCardState();
 }
 
-class _StatusCardState extends State<StatusCard> {
+class _StatusCardState extends State<StatusCard> with SingleTickerProviderStateMixin {
   Timer? _ticker;
   DateTime? _since;
-
+  VpnStatus? _prevStatus;
+  late final AnimationController _animController = AnimationController(vsync: this, duration: const Duration(seconds: 2));
+  
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -47,11 +49,15 @@ class _StatusCardState extends State<StatusCard> {
       _ticker = null;
       _since = null;
     }
+    if (status == VpnStatus.connecting || status == VpnStatus.disconnecting) { if (!_animController.isAnimating) _animController.repeat(); } else if (_animController.isAnimating) { _animController.stop(); }
+    if (_prevStatus != VpnStatus.connected && status == VpnStatus.connected && state.pingMs == null && !state.pinging) { WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) state.testPing(); }); }
+_prevStatus = status;
   }
 
   @override
   void dispose() {
     _ticker?.cancel();
+_animController.dispose();
     super.dispose();
   }
 
@@ -93,8 +99,9 @@ class _StatusCardState extends State<StatusCard> {
         children: [
           _PowerButton(
             status: status,
+animation: _animController,
             busy: busy,
-            onTap: busy ? null : state.toggle,
+            onTap: status == VpnStatus.disconnecting ? null : state.toggle, // busy ? null : state.toggle,
           ),
           const SizedBox(height: 20),
           _Metrics(
@@ -117,11 +124,13 @@ class _PowerButton extends StatelessWidget {
   const _PowerButton({
     required this.status,
     required this.busy,
+required this.animation,
     required this.onTap,
   });
 
   final VpnStatus status;
   final bool busy;
+final Animation<double> animation;
   final VoidCallback? onTap;
 
   @override
@@ -145,7 +154,7 @@ class _PowerButton extends StatelessWidget {
         ? Colors.white.withValues(alpha: 0.92)
         : theme.colorScheme.onSurface;
 
-    return SizedBox(
+    return AnimatedBuilder(animation: animation, builder: (context, _) { return SizedBox(
       width: 248,
       height: 248,
       child: Stack(
@@ -157,6 +166,7 @@ class _PowerButton extends StatelessWidget {
               primary: primary,
               secondary: secondary,
               active: status == VpnStatus.connected || busy,
+progress: animation.value,
             ),
           ),
           Container(
@@ -215,6 +225,10 @@ class _PowerButton extends StatelessWidget {
                           letterSpacing: 1.3,
                         ),
                       ),
+if (status == VpnStatus.connecting) ...[
+const SizedBox(height: 2),
+Text('TAP TO CANCEL', textAlign: TextAlign.center, style: TextStyle(color: labelColor.withValues(alpha: 0.7), fontSize: 9, fontWeight: FontWeight.w600, letterSpacing: 1.0)),
+],
                     ],
                   ),
                 ),
@@ -224,6 +238,7 @@ class _PowerButton extends StatelessWidget {
         ],
       ),
     );
+});
   }
 }
 
@@ -232,11 +247,13 @@ class _MeshRingPainter extends CustomPainter {
     required this.primary,
     required this.secondary,
     required this.active,
+this.progress = 0.0,
   });
 
   final Color primary;
   final Color secondary;
   final bool active;
+final double progress;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -245,7 +262,7 @@ class _MeshRingPainter extends CustomPainter {
     const nodeCount = 8;
 
     final points = List<Offset>.generate(nodeCount, (i) {
-      final angle = -math.pi / 2 + (2 * math.pi * i / nodeCount);
+      final angle = -math.pi / 2  + progress * 2 * math.pi+ (2 * math.pi * i / nodeCount);
       return Offset(
         center.dx + radius * math.cos(angle),
         center.dy + radius * math.sin(angle),
@@ -276,7 +293,7 @@ class _MeshRingPainter extends CustomPainter {
     for (var i = 0; i < nodeCount; i++) {
       final nodeColor = i.isEven ? primary : secondary;
       glowPaint.color = nodeColor.withValues(alpha: active ? 0.85 : 0.6);
-      canvas.drawCircle(points[i], 5.5, glowPaint);
+      canvas.drawCircle(points[i], 5.5 + (active ? 2.5 * (0.5 + 0.5 * math.sin(progress * 2 * math.pi)) : 0), glowPaint);
 
       final corePaint = Paint()..color = nodeColor;
       canvas.drawCircle(points[i], 3.0, corePaint);
@@ -287,6 +304,7 @@ class _MeshRingPainter extends CustomPainter {
   bool shouldRepaint(_MeshRingPainter oldDelegate) =>
       oldDelegate.primary != primary ||
       oldDelegate.secondary != secondary ||
+oldDelegate.progress != progress ||
       oldDelegate.active != active;
 }
 
