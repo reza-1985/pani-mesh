@@ -22,6 +22,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.ScheduledFuture
 import java.util.concurrent.TimeUnit
+import com.panimesh.app.R
 
 class BpbVpnService : VpnService() {
 
