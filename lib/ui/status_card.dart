@@ -32,7 +32,7 @@ class _StatusCardState extends State<StatusCard> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final state = AppStateScope.of(context);
+    final state = AppScope.of(context);
     final status = state.status;
     if (status == VpnStatus.connected) {
       _since ??= state.connectedAt ?? DateTime.now();
@@ -57,7 +57,7 @@ class _StatusCardState extends State<StatusCard> {
 
   @override
   Widget build(BuildContext context) {
-    final state = AppStateScope.of(context);
+    final state = AppScope.of(context);
     final status = state.status;
     final busy = state.isBusy;
     final connected = status == VpnStatus.connected;
@@ -94,7 +94,7 @@ class _StatusCardState extends State<StatusCard> {
           _PowerButton(
             status: status,
             busy: busy,
-            onTap: busy ? null : state.toggleConnection,
+            onTap: busy ? null : state.toggle,
           ),
           const SizedBox(height: 20),
           _Metrics(
@@ -102,7 +102,7 @@ class _StatusCardState extends State<StatusCard> {
             connected: connected,
             pinging: state.pinging,
             pingMs: state.pingMs,
-            onPing: state.ping,
+            onPing: state.testPing,
             myIp: state.myIp,
             workerIp: state.workerIp,
             lanIp: state.lanIp,
