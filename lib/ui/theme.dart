@@ -52,10 +52,22 @@ const kRangeDashGap = 12.0;
 
 /// The app theme for [brightness], with the palette seeded from [color] (picked in Settings).
 ThemeData buildTheme(Brightness brightness, ThemeColor color) {
-  final scheme = ColorScheme.fromSeed(
+  final baseScheme = ColorScheme.fromSeed(
     seedColor: color.seed,
     brightness: brightness,
   );
+  final scheme = brightness == Brightness.dark
+      ? baseScheme.copyWith(
+          primary: const Color(0xFF00D2FF),
+          onPrimary: const Color(0xFF0B1020),
+          secondary: const Color(0xFF8B5CF6),
+          onSecondary: Colors.white,
+          surface: const Color(0xFF121528),
+          surfaceContainerLow: const Color(0xFF1A1F38),
+          surfaceContainer: const Color(0xFF1A1F38),
+          surfaceContainerHigh: const Color(0xFF222847),
+        )
+      : baseScheme;
   final theme = _buildTheme(scheme);
   // No letter spacing: Material's (up to 0.5) is tuned for Roboto. It's applied to the finished
   // theme's text styles, which already carry the colors and font; to turn it off, return
@@ -70,15 +82,21 @@ ThemeData _buildTheme(ColorScheme scheme) {
       borderRadius: BorderRadius.circular(kInputRadius),
     ),
   );
+  final isDark = scheme.brightness == Brightness.dark;
   return ThemeData(
     colorScheme: scheme,
+    scaffoldBackgroundColor: isDark ? const Color(0xFF121528) : null,
     useMaterial3: true,
     fontFamily: 'OpenSans',
     listTileTheme: const ListTileThemeData(
       contentPadding: EdgeInsets.symmetric(horizontal: 20),
     ),
     // Superellipse corners for every card and dialog.
-    cardTheme: CardThemeData(shape: roundedShape(kSmallCardRadius)),
+    cardTheme: CardThemeData(
+      color: isDark ? const Color(0xFF1A1F38) : null,
+      elevation: isDark ? 0 : null,
+      shape: roundedShape(kSmallCardRadius),
+    ),
     dialogTheme: DialogThemeData(shape: roundedShape(kDialogRadius)),
     // One style for every text and dropdown field. For filled fields instead of outlined:
     // InputDecorationTheme(filled: true, border: OutlineInputBorder(borderSide: BorderSide.none, borderRadius: …)).
