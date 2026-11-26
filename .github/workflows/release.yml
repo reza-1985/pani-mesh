@@ -85,7 +85,13 @@ jobs:
       - run: flutter pub get --enforce-lockfile
 
       - run: flutter test --no-pub
-
+      - name: Extract custom app icons
+        run: |
+          if [ -f "pani-mesh-icons.zip" ]; then
+            rm -rf android/app/src/main/res/mipmap-anydpi-v26
+            unzip -o pani-mesh-icons.zip -d .
+          fi
+          
       - name: Sign release APKs
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
