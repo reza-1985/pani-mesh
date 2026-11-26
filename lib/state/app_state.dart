@@ -140,7 +140,7 @@ class AppState extends ChangeNotifier {
   /// Whether the app still needs the setup wizard: never finished (installs from before the
   /// flag count as finished when they have a deployment), or showing its last page.
   bool get needsSetup =>
-      (!device.setupDone && deployments.isEmpty) || setupInProgress;
+      setupInProgress;
 
   /// Marks the wizard finished and leaves it.
   void finishSetup() {
@@ -199,8 +199,8 @@ class AppState extends ChangeNotifier {
     ])
       if (switch (m) {
         ConnectionMode.worker => deployments.isNotEmpty,
-        ConnectionMode.warp => profile.warp.account != null,
-        ConnectionMode.masque => profile.masque.account != null,
+        ConnectionMode.warp => true,
+        ConnectionMode.masque => true,
         ConnectionMode.ssh => profile.ssh.isConfigured,
         _ => true,
       })
