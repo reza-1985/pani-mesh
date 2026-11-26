@@ -15,7 +15,6 @@ import 'cf_accounts_page.dart';
 import 'chain_proxies_page.dart';
 import 'cloudflare_scanner_page.dart';
 import 'dns_page.dart';
-import 'donation_page.dart';
 import 'fragments_page.dart';
 import 'license_page.dart';
 import 'noises_page.dart';
@@ -713,15 +712,7 @@ class SettingsPage extends StatelessWidget {
                   MaterialPageRoute(builder: (_) => const LicensePageView()),
                 ),
               ),
-              ListTile(
-                leading: const Icon(Symbols.favorite_rounded),
-                title: const Text('Donation'),
-                subtitle: const Text('Keep this project alive'),
-                trailing: const Icon(Symbols.chevron_right_rounded),
-                onTap: () => Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (_) => const DonationPage())),
-              ),
+             
             ],
           ),
         ],
@@ -926,7 +917,7 @@ class _CustomDomainTileState extends State<_CustomDomainTile> {
       help:
           'The domain must be registered on the same Cloudflare account. '
           'Just add a desired subdomain which is not available on Cloudflare yet. '
-          'BPB creates the DNS record and adds it to the worker.',
+          'Pani Mesh creates the DNS record and adds it to the worker.',
       validator: (v) => isDomain(v) ? null : 'Invalid domain',
     );
     if (domain == null || !mounted) return;
@@ -1015,7 +1006,7 @@ class _MitmCaTileState extends State<_MitmCaTile> {
         content: const Text(
           'Certificate will be saved to Downloads folder. Install it in Settings → '
           'Security → Encryption & credentials → Install a certificate → CA certificate.\n\n'
-          'Never share BPB certificate files with anyone. Whoever has them can sniff your '
+          'Never share Pani Mesh certificate files with anyone. Whoever has them can sniff your '
           'browser traffic.',
         ),
         actions: [
@@ -1314,7 +1305,7 @@ class _CloudflareAccountsTile extends StatelessWidget {
   }
 }
 
-const sourceCodeUrl = 'https://github.com/bia-pain-bache/BPB-VPN';
+const sourceCodeUrl = 'https://github.com/reza-1985/pani-mesh';
 
 /// The installed app's version (pubspec.yaml's); opens the cores' versions.
 class _VersionTile extends StatelessWidget {
@@ -1420,7 +1411,7 @@ class _UpdateTileState extends State<_UpdateTile> {
       if (!mounted) return;
       if (update == null) {
         messenger.showSnackBar(
-          const SnackBar(content: Text('BPB is up to date')),
+          const SnackBar(content: Text('Pani Mesh is up to date')),
         );
       } else {
         await _offer(update);
@@ -1436,7 +1427,7 @@ class _UpdateTileState extends State<_UpdateTile> {
     final download = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('BPB ${update.version} is available'),
+        title: Text('Pani Mesh ${update.version} is available'),
         content: SingleChildScrollView(
           child: Text(
             update.notes.isEmpty ? 'No release notes.' : update.notes,
