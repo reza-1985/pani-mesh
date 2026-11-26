@@ -35,7 +35,7 @@ flutter:
     # The status bar icon (android/…/drawable-*/ic_stat_vpn.png), for the home page title;
     # the 1.5x–4.0x folders hold the denser copies.
     - assets/icons/ic_stat_vpn.png
-     - assets/icons/pani_mesh_logo.png
+    - assets/icons/pani_mesh_logo.png
   # Tor bridges for the setup wizard's "Retry with Tor": bridges.json, written at build time by
     # scripts/fetch_tor_bridges.sh (required before building).
     - assets/tor/
