@@ -31,7 +31,7 @@ class HomePage extends StatelessWidget {
               color: Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(width: 6),
-            const Text('BPB', style: TextStyle(fontWeight: FontWeight.w600)),
+            const Text('Pani Mesh', style: TextStyle(fontWeight: FontWeight.w600)),
           ],
         ),
         actions: [
