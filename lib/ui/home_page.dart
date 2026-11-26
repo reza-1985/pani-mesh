@@ -24,12 +24,7 @@ class HomePage extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // The status bar icon, tinted like the other icons.
-            ImageIcon(
-              const AssetImage('assets/icons/ic_stat_vpn.png'),
-              size: 24,
-              color: Theme.of(context).colorScheme.primary,
-            ),
+           ClipRRect(borderRadius: BorderRadius.circular(7), child: Image.asset('assets/icons/pani_mesh_logo.png', width: 28, height: 28, fit: BoxFit.cover)),
             const SizedBox(width: 6),
             const Text('Pani Mesh', style: TextStyle(fontWeight: FontWeight.w600)),
           ],
