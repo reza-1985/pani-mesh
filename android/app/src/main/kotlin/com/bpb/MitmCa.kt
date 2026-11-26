@@ -43,7 +43,7 @@ object MitmCa {
             activity.startActivity(
                 KeyChain.createInstallIntent()
                     .putExtra(KeyChain.EXTRA_CERTIFICATE, der)
-                    .putExtra(KeyChain.EXTRA_NAME, "BPB"),
+                    .putExtra(KeyChain.EXTRA_NAME, "Pani Mesh"),
             )
             return null
         }
