@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -49,7 +50,7 @@ class _StatusCardState extends State<StatusCard> with SingleTickerProviderStateM
       _ticker = null;
       _since = null;
     }
-    if (status == VpnStatus.connecting || status == VpnStatus.disconnecting) { if (!_animController.isAnimating) _animController.repeat(); } else if (_animController.isAnimating) { _animController.stop(); }
+    if (status == VpnStatus.disconnected) { if (_animController.isAnimating) _animController.stop(); } else { final targetDuration = (status == VpnStatus.connecting || status == VpnStatus.disconnecting) ? const Duration(milliseconds: 19800) : const Duration(seconds: 156); if (_animController.duration != targetDuration) { _animController.duration = targetDuration; _animController.repeat(); } else if (!_animController.isAnimating) { _animController.repeat(); } }
     if (_prevStatus != VpnStatus.connected && status == VpnStatus.connected && state.pingMs == null && !state.pinging) { WidgetsBinding.instance.addPostFrameCallback((_) { if (mounted) state.testPing(); }); }
 _prevStatus = status;
   }
@@ -155,13 +156,13 @@ final Animation<double> animation;
         : theme.colorScheme.onSurface;
 
     return AnimatedBuilder(animation: animation, builder: (context, _) { return SizedBox(
-      width: 268,
-      height: 268,
+      width: 286,
+      height: 286,
       child: Stack(
         alignment: Alignment.center,
         children: [
           CustomPaint(
-            size: const Size(268, 268),
+            size: const Size(286, 286),
             painter: _MeshRingPainter(
               primary: primary,
               secondary: secondary,
@@ -193,6 +194,12 @@ progress: animation.value,
                   blurRadius: 36,
                   spreadRadius: 1,
                 ),
+if (status == VpnStatus.connected)
+                BoxShadow(
+color: primary.withValues(alpha: 0.34),
+blurRadius: 52,
+spreadRadius: 6,
+),
               ],
             ),
             child: Material(
@@ -299,19 +306,18 @@ class _MeshRingPainter extends CustomPainter {
     final r2 = w * 0.405;
     final r3 = w * 0.468;
     final intensity = connected ? 1.0 : (active ? 0.85 : 0.62);
-    final spin = active && !connected ? progress * 2 * math.pi : 0.0;
-    final pulse = active && !connected ? 0.5 + 0.5 * math.sin(progress * 2 * math.pi) : 0.0;
- final edgeNodes = <Offset>[];
+ final rot1 = (!active && !connected) ? 0.0 : progress * 6 * math.pi; final rot2 = (!active && !connected) ? 0.0 : -progress * 4 * math.pi; final pulse = (!active && !connected) ? 0.45 : (active ? 0.5 + 0.5 * math.sin(progress * 2 * math.pi * 16) : 0.7 + 0.3 * math.sin(progress * 2 * math.pi * 55));
+    final edgeNodes = <Offset>[];
     final ring1Nodes = <Offset>[];
     final ring2Nodes = <Offset>[];
     final ring3Nodes = <Offset>[];
     final outerDotNodes = <Offset>[];
     for (int i = 0; i < n; i++) {
-      final baseA = (i / n) * 2 * math.pi - math.pi / 2 + spin;
+     final baseA = (i / n) * 2 * math.pi - math.pi / 2 + rot1;
       final a1 = baseA + math.pi / n;
       final jitterA = math.sin(i * 2.3 + 0.7) * 0.12;
       final jitterR = math.cos(i * 1.7 + 0.4) * (w * 0.014);
-      final a2 = baseA + jitterA;
+     final a2 = (i / n) * 2 * math.pi - math.pi / 2 + rot2 + jitterA;
       final a3 = baseA + math.pi / (n * 1.5);
       edgeNodes.add(Offset(center.dx + rEdge * math.cos(baseA), center.dy + rEdge * math.sin(baseA)));
       ring1Nodes.add(Offset(center.dx + r1 * math.cos(a1), center.dy + r1 * math.sin(a1)));
@@ -321,37 +327,65 @@ class _MeshRingPainter extends CustomPainter {
     }
     canvas.drawCircle(center, r1, Paint()..style = PaintingStyle.stroke..strokeWidth = 3.2..color = _palette[0].withValues(alpha: (0.16 + 0.08 * pulse) * intensity));
     canvas.drawCircle(center, r1, Paint()..style = PaintingStyle.stroke..strokeWidth = 1.0..color = _palette[0].withValues(alpha: (0.48 + 0.14 * pulse) * intensity));
-    final faintPaint = Paint()..style = PaintingStyle.stroke..strokeWidth = 0.85;
-    final boldPaint = Paint()..style = PaintingStyle.stroke..strokeWidth = 1.35;
-    for (int i = 0; i < n; i++) {
-      final next = (i + 1) % n;
-      final c = _nodeColor(i, n);
-      faintPaint.color = c.withValues(alpha: (0.28 + 0.10 * pulse) * intensity);
-      boldPaint.color = c.withValues(alpha: (0.62 + 0.18 * pulse) * intensity);
-      canvas.drawLine(ring1Nodes[i], ring1Nodes[next], faintPaint);
-      canvas.drawLine(ring2Nodes[i], ring2Nodes[next], boldPaint);
-      canvas.drawLine(ring3Nodes[i], ring3Nodes[next], boldPaint);
-      canvas.drawLine(edgeNodes[i], ring1Nodes[i], faintPaint);
-      canvas.drawLine(edgeNodes[i], ring1Nodes[(i + n - 1) % n], faintPaint);
-      canvas.drawLine(ring1Nodes[i], ring2Nodes[i], faintPaint);
-      canvas.drawLine(ring1Nodes[i], ring2Nodes[next], faintPaint);
-      canvas.drawLine(ring2Nodes[i], ring3Nodes[i], boldPaint);
-      canvas.drawLine(ring2Nodes[next], ring3Nodes[i], faintPaint);
-    }
-    final dotPaint = Paint()..style = PaintingStyle.fill;
-    for (int i = 0; i < n; i++) {
-      final c = _nodeColor(i, n);
-      dotPaint.color = c.withValues(alpha: (0.24 + 0.08 * pulse) * intensity);
-      canvas.drawCircle(ring3Nodes[i], 5.5, dotPaint);
-      dotPaint.color = c.withValues(alpha: (0.90 + 0.10 * pulse) * intensity);
-      canvas.drawCircle(ring3Nodes[i], 2.8, dotPaint);
-      dotPaint.color = c.withValues(alpha: 0.72 * intensity);
-      canvas.drawCircle(ring2Nodes[i], 2.2, dotPaint);
-      dotPaint.color = c.withValues(alpha: 0.55 * intensity);
-      canvas.drawCircle(ring1Nodes[i], 1.7, dotPaint);
-      dotPaint.color = c.withValues(alpha: 0.65 * intensity);
-      canvas.drawCircle(outerDotNodes[i], 1.3, dotPaint);
-    }
+  
+  void drawLine(Offset p1, Offset p2, Color c1, Color c2, double width, double alpha) {
+final paint = Paint()
+..style = PaintingStyle.stroke
+..strokeWidth = width
+..strokeCap = StrokeCap.round
+..shader = ui.Gradient.linear(
+p1,
+p2,
+[
+c1.withValues(alpha: alpha * intensity),
+c2.withValues(alpha: alpha * intensity),
+],
+);
+canvas.drawLine(p1, p2, paint);
+  }
+    void drawNode(Offset pos, Color color, double radius, double alpha) {
+final glowRadius = radius * 2.4;
+final glowPaint = Paint()
+..style = PaintingStyle.fill
+..shader = ui.Gradient.radial(
+pos,
+glowRadius,
+[
+color.withValues(alpha: alpha * 0.65 * intensity),
+color.withValues(alpha: 0.0),
+],
+);
+canvas.drawCircle(pos, glowRadius, glowPaint);
+final corePaint = Paint()
+..style = PaintingStyle.fill
+..color = color.withValues(alpha: alpha * intensity);
+canvas.drawCircle(pos, radius, corePaint);
+}
+for (int i = 0; i < n; i++) {
+final next = (i + 1) % n;
+final prev = (i + n - 1) % n;
+final c = _nodeColor(i, n);
+final cNext = _nodeColor(next, n);
+final cPrev = _nodeColor(prev, n);
+final faintAlpha = 0.28 + 0.10 * pulse;
+final boldAlpha = 0.62 + 0.18 * pulse;
+drawLine(ring1Nodes[i], ring1Nodes[next], c, cNext, 0.85, faintAlpha);
+drawLine(ring2Nodes[i], ring2Nodes[next], c, cNext, 1.35, boldAlpha);
+drawLine(ring3Nodes[i], ring3Nodes[next], c, cNext, 1.35, boldAlpha);
+drawLine(edgeNodes[i], ring1Nodes[i], c, c, 0.85, faintAlpha);
+drawLine(edgeNodes[i], ring1Nodes[prev], c, cPrev, 0.85, faintAlpha);
+drawLine(ring1Nodes[i], ring2Nodes[i], c, c, 0.85, faintAlpha);
+drawLine(ring1Nodes[i], ring2Nodes[next], c, cNext, 0.85, faintAlpha);
+drawLine(ring2Nodes[i], ring3Nodes[i], c, c, 1.35, boldAlpha);
+drawLine(ring2Nodes[next], ring3Nodes[i], cNext, c, 0.85, faintAlpha);
+}
+for (int i = 0; i < n; i++) {
+final c = _nodeColor(i, n);
+drawNode(ring3Nodes[i], c, 2.8, 0.90 + 0.10 * pulse);
+drawNode(ring2Nodes[i], c, 2.2, 0.72);
+drawNode(ring1Nodes[i], c, 1.7, 0.55);
+drawNode(outerDotNodes[i], c, 1.3, 0.65);
+}
   }
 
   @override
