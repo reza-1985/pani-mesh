@@ -7,6 +7,7 @@ Future<void> showAboutPaniDialog(BuildContext context) {
       return Directionality(
         textDirection: TextDirection.rtl,
         child: Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           backgroundColor: const Color(0xFF181D34),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(24),
@@ -30,18 +31,19 @@ Future<void> showAboutPaniDialog(BuildContext context) {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 12),
                 const Text(
                   'اگر پانی را از Pani VPN می‌شناسید، الان دیگر ترفیع گرفته و شده «مهندس ارشد شبکه»؛ البته همچنان با مدیریت از راه دور روی مبل خانه! در Pani Mesh پانی به‌جای یک مسیر، یک شبکه «مِش» (چندمسیره و پر از راه مخفی) ساخته که فیلترینگ هرچقدر سخت و بسته باشد، پانی راهش را پیدا می‌کند. از سرعتِ موشکی MASQUE و WARP گرفته تا تونل شخصی VLESS و SSH و حتی با کمک نیروهای Psiphon و Tor؛ کافی است یک بار روی صورت پشمالویش بزنید تا خودش راه باز به دنیای آزاد را بو بکشد و پیدا کند!',
-                  textAlign: TextAlign.center,
+                  textAlign: TextAlign.right,
                   style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 14,
-                    height: 1.6,
+                    color: const Color(0xFFE8EEFF),
+                    fontSize: 15.5,
+                    height: 1.9,
+                    fontFamilyFallback: const ['Vazirmatn', 'Noto Sans Arabic', 'sans-serif'],
                   ),
                 ),
                 const SizedBox(height: 20),
