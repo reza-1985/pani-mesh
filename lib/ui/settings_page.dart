@@ -1547,7 +1547,7 @@ class _ExportSettingsTile extends StatelessWidget {
     final state = AppScope.read(context);
     final messenger = ScaffoldMessenger.of(context);
     final name =
-        'bpb-settings-${DateTime.now().toIso8601String().substring(0, 10)}.json';
+        'pani-mesh-settings-${DateTime.now().toIso8601String().substring(0, 10)}.json';
     final content = state.exportSettingsFile();
     try {
       if (download) {
