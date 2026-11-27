@@ -1227,7 +1227,7 @@ class DeviceSettings {
     this.exitChains = const {},
     this.exitRegion = '',
     this.themeColor = 'blue',
-    this.themeMode = 'system',
+    this.themeMode = 'dark',
     this.deployment = '',
     this.setupDone = false,
   });
