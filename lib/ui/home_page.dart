@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../models/settings.dart';
+import 'about_pani_dialog.dart';
 import '../state/app_state.dart';
 import 'chip_menu.dart';
 import 'config_view_page.dart';
@@ -24,7 +25,7 @@ class HomePage extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-           ClipRRect(borderRadius: BorderRadius.circular(7), child: Image.asset('assets/icons/pani_mesh_logo.png', width: 28, height: 28, fit: BoxFit.cover)),
+          GestureDetector(onTap: () => showAboutPaniDialog(context), child:  ClipRRect(borderRadius: BorderRadius.circular(7), child: Image.asset('assets/icons/pani_mesh_logo.png', width: 28, height: 28, fit: BoxFit.cover))),
             const SizedBox(width: 6),
             const Text('Pani Mesh', style: TextStyle(fontWeight: FontWeight.w600)),
           ],
