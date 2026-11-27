@@ -25,7 +25,7 @@ class HomePage extends StatelessWidget {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-          GestureDetector(onTap: () => showAboutPaniDialog(context), child:  ClipRRect(borderRadius: BorderRadius.circular(7), child: Image.asset('assets/icons/pani_mesh_logo.png', width: 28, height: 28, fit: BoxFit.cover))),
+          GestureDetector(onTap: () => showAboutPaniDialog(context), child:  ClipRRect(borderRadius: BorderRadius.circular(11), child: Image.asset('assets/icons/pani_mesh_logo.png', width: 44, height: 44, fit: BoxFit.cover))),
             const SizedBox(width: 6),
             const Text('Pani Mesh', style: TextStyle(fontWeight: FontWeight.w600)),
           ],
