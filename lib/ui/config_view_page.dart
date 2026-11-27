@@ -42,7 +42,7 @@ class _ConfigViewPageState extends State<ConfigViewPage> {
               if (text == null || !context.mounted) return;
               try {
                 final where = await VpnChannel.saveFile(
-                  name: 'bpb-config.json',
+                  name: 'pani-mesh-config.json',
                   content: text,
                 );
                 if (!context.mounted) return;
