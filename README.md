@@ -1,4 +1,4 @@
-<p align="center"><img src="/reza-1985/pani-vpn/raw/main/app/assets/logo.png" width="128" alt="Pani Mesh"></p>
+<p align="center"><img src="images/pani-mesh-logo.png" width="128" alt="Pani Mesh"></p>
 
 <h1 align="center">Pani Mesh</h1>
 
