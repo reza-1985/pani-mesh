@@ -11,6 +11,7 @@ import '../services/updates.dart';
 import '../services/vpn_channel.dart';
 import '../services/xray_config.dart';
 import '../state/app_state.dart';
+import 'about_pani_dialog.dart';
 import 'cf_accounts_page.dart';
 import 'chain_proxies_page.dart';
 import 'cloudflare_scanner_page.dart';
@@ -682,6 +683,12 @@ class SettingsPage extends StatelessWidget {
             children: [
               const _VersionTile(),
               const _UpdateTile(),
+            ListTile(
+              leading: const Icon(Icons.pets_rounded),
+              title: const Text('About Pani'),
+              subtitle: const Text('داستان پانی مش'),
+              onTap: () => showAboutPaniDialog(context),
+            ),
               ListTile(
                 leading: const Icon(Symbols.code_rounded),
                 title: const Text('Source code'),
